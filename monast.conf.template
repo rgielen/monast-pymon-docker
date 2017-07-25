@@ -1,0 +1,43 @@
+[global]
+bind_host = $BIND_HOST
+bind_port = $BIND_PORT
+auth_required = false
+
+[server: Asterisk]
+hostname = $ASTERISK_HOST
+hostport = $ASTERISK_PORT
+username = $AMI_USERNAME
+password = $AMI_PASSWORD
+default_context = $DEFAULT_CONTEXT
+transfer_context = $TRANSFER_CONTEXT
+meetme_context = $MEETME_CONTEXT
+meetme_prefix  = 
+
+[peers]
+sortby = callerid
+default = show
+
+[meetmes]
+default = show
+
+[queues]
+default = show
+
+[user: admin]
+secret  = $USER_ADMIN_SECRET
+roles   = originate,queue,command,spy
+servers = ALL
+
+[user: agent]
+secret  = $USER_AGENT_SECRET
+roles   = originate,queue,spy
+servers = ALL
+
+[user: demo]
+secret  = 
+roles   = 
+servers = ALL
+
+$ADDITIONAL_CONFIG_LINES
+
+## END
