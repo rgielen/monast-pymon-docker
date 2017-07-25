@@ -84,6 +84,5 @@ servers = ALL\n\
 \n## END' \
 >> /etc/monast.conf
 
-RUN cat /etc/monast.conf
-
 EXPOSE ${BIND_PORT}
+ENTRYPOINT ["/pymon/monast.py"]
