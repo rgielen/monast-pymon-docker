@@ -1,7 +1,7 @@
 FROM ubuntu:zesty
 MAINTAINER "Rene Gielen" <rgielen@apache.org>
 
-RUN apt-get update && apt-get -y install python python-twisted python-zope.interface python-pip wget unzip \
+RUN apt-get update && apt-get -y install python python-twisted python-zope.interface python-pip wget unzip gettext-base \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/* \
         && rm -rf /tmp/*
@@ -30,6 +30,12 @@ RUN wget https://github.com/dagmoller/monast/archive/master.zip \
         && echo "$PWD" \
         && rm master.zip
 
+RUN groupadd -r monast && useradd -r -g monast monast && mkdir /pymon/config && chown monast.monast /pymon/config
+
+ADD monast.conf.template /pymon/
+ADD configure-and-start.sh /pymon/
+# VOLUME /pymon/config
+
 ENV BIND_HOST=0.0.0.0
 ENV BIND_PORT=5039
 ENV ASTERISK_HOST=localhost
@@ -41,48 +47,10 @@ ENV TRANSFER_CONTEXT=default
 ENV MEETME_CONTEXT=default
 ENV USER_ADMIN_SECRET=admin
 ENV USER_AGENT_SECRET=agent
-
-RUN echo '[global]\n\
-bind_host = '$BIND_HOST'\n\
-bind_port = '$BIND_PORT'\n\
-auth_required = false\n\
-\n\
-[server: Asterisk]\n\
-hostname = '$ASTERISK_HOST'\n\
-hostport = '$ASTERISK_PORT'\n\
-username = '$AMI_USERNAME'\n\
-password = '$AMI_PASSWORD'\n\
-default_context = '$DEFAULT_CONTEXT'\n\
-transfer_context = '$TRANSFER_CONTEXT'\n\
-meetme_context = '$MEETME_CONTEXT'\n\
-meetme_prefix  = \n\
-\n\
-[peers]\n\
-sortby = callerid\n\
-default = show\n\
-\n\
-[meetmes]\n\
-default = show\n\
-\n\
-[queues]\n\
-default = show\n\
-\n\
-[user: admin]\n\
-secret  = '$USER_ADMIN_SECRET'\n\
-roles   = originate,queue,command,spy\n\
-servers = ALL\n\
-\n\
-[user: agent]\n\
-secret  = '$USER_AGENT_SECRET'\n\
-roles   = originate,queue,spy\n\
-servers = ALL\n\
-\n\
-[user: demo]\n\
-secret  = \n\
-roles   = \n\
-servers = ALL\n\
-\n## END' \
->> /etc/monast.conf
+ENV ADDITIONAL_CONFIG_LINES=""
 
 EXPOSE ${BIND_PORT}
-ENTRYPOINT ["/pymon/monast.py"]
+
+USER monast
+
+ENTRYPOINT ["/pymon/configure-and-start.sh"]
