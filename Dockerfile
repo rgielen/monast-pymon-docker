@@ -1,4 +1,4 @@
-FROM ubuntu:zesty
+FROM ubuntu:17.10
 MAINTAINER "Rene Gielen" <rgielen@apache.org>
 
 RUN apt-get update && apt-get -y install python python-twisted python-zope.interface python-pip wget unzip gettext-base \
